@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { filterItem } from "../redux/action";
+import {
+  filterItem,
+  searchItem,
+  addToCart,
+  viewDetails,
+} from "../redux/action";
 import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -12,18 +17,19 @@ import {
   Button,
   Typography,
   Grid,
+  MenuItem,
+  InputLabel,
+  FormControl,
+  Select,
+  TextField,
 } from "@material-ui/core/";
-import { addToCart, viewDetails } from "../redux/action";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import Select from "@material-ui/core/Select";
+import SearchIcon from "@material-ui/icons/Search";
 
 const useStyles = makeStyles({
   root: {
     maxWidth: 290,
     float: "left",
-    marginLeft: 25,
+    marginLeft: 40,
     marginTop: 20,
     border: "1px solid gray",
     height: 550,
@@ -63,11 +69,13 @@ export default function Category() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedBudgets, setSelectedBudgets] = useState([]);
   const [sortByPrice, setSortByPrice] = useState("all");
+  const [searchName, setSearchName] = useState("");
   const [open, setOpen] = useState(false);
   const classes = useStyles();
   const history = useHistory();
   const changeCategory = useSelector((state) => state.categoryName);
   const filterItems = useSelector((state) => state.filterItems);
+  const searchItems = useSelector((state) => state.searchItems);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -147,6 +155,15 @@ export default function Category() {
     setOpen(true);
   };
 
+  const handleSearchChange = (e) => {
+    setSearchName(e.target.value);
+  };
+  console.log(searchName, searchItems);
+
+  const handleClickSearch = () => {
+    dispatch(searchItem(searchName));
+  };
+
   console.log(filterItems);
   return (
     <div>
@@ -168,9 +185,9 @@ export default function Category() {
               ))}
           </div>
           <FormControl
-            style={{width: "150px", marginLeft: "15px",  marginTop: "20px" }}
+            style={{ width: "150px", marginLeft: "15px", marginTop: "20px" }}
           >
-            <InputLabel style={{ fontWeight: 'bold'}}>Sort By</InputLabel>
+            <InputLabel style={{ fontWeight: "bold" }}>Sort By</InputLabel>
             <Select
               open={open}
               onClose={handleClose}
@@ -184,7 +201,8 @@ export default function Category() {
               <MenuItem value="asc">Ascending</MenuItem>
               <MenuItem value="desc">Descending</MenuItem>
             </Select>
-          </FormControl> <br></br>
+          </FormControl>{" "}
+          <br></br>
           <h4>Budget</h4>
           <div>
             {budgetList.length &&
@@ -214,61 +232,138 @@ export default function Category() {
           </CardActions>
         </Grid>
         <Grid item xs={10}>
-          {filterItems ? (
-            filterItems.map((item) => {
-              return (
-                <Card className={classes.root}>
-                  <CardActionArea>
-                    <CardMedia
-                      className={classes.media}
-                      image={item.image}
-                      title="Contemplative Reptile"
-                    />
-                    <CardContent>
-                      <Typography
-                        gutterBottom
-                        variant="body2"
-                        component="p"
-                        style={{ textAlign: "center" }}
+          <Grid container spacing={1}style={{ margin: "35px" }}>
+              <Grid item xs={4}> </Grid>
+            <Grid item xs={6}>
+            <TextField
+              label="Search.."
+              style={{ marginRight: "10px", marginTop: "-10px" }}
+              value={searchName}
+              onChange={handleSearchChange}
+            ></TextField>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              onClick={handleClickSearch}
+            >
+              <SearchIcon />
+            </Button>
+          </Grid>
+          </Grid>
+          <Grid item xs={12}>
+            {searchItems.length > 0 && searchItems
+              ? searchItems.map((item) => {
+                  return (
+                    <Card className={classes.root}>
+                      <CardActionArea>
+                        <CardMedia
+                          className={classes.media}
+                          image={item.image}
+                          title="Contemplative Reptile"
+                        />
+                        <CardContent>
+                          <Typography
+                            gutterBottom
+                            variant="body2"
+                            component="p"
+                            style={{ textAlign: "center" }}
+                          >
+                            NAME : {item.name}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            color="textSecondary"
+                            component="p"
+                            style={{ textAlign: "center" }}
+                          >
+                            AMOUNT : &#x20B9;{item.price}
+                          </Typography>
+                        </CardContent>
+                      </CardActionArea>
+                      <CardActions>
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          className={classes.Button}
+                          onClick={() => handleClickViewdetails(item.id)}
+                        >
+                          View Details
+                        </Button>
+                      </CardActions>
+                      <CardActions>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          className={classes.Button}
+                          onClick={() => handleClickAddTocart(item.id)}
+                        >
+                          Add To Cart
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  );
+                })
+              : <div style={{ textAlign: "center"}}> Search Data is not Available</div>}
+          </Grid>
+          <Grid item xs={12}>
+            <p style={{textAlign:"center", color:"blue", fontWeight: "bold", textDecoration:"underline"}}> Category Wise Filterd Data</p>
+            {filterItems ? (
+              filterItems.map((item) => {
+                return (
+                  <Card className={classes.root}>
+                    <CardActionArea>
+                      <CardMedia
+                        className={classes.media}
+                        image={item.image}
+                        title="Contemplative Reptile"
+                      />
+                      <CardContent>
+                        <Typography
+                          gutterBottom
+                          variant="body2"
+                          component="p"
+                          style={{ textAlign: "center" }}
+                        >
+                          NAME : {item.name}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="textSecondary"
+                          component="p"
+                          style={{ textAlign: "center" }}
+                        >
+                          AMOUNT : &#x20B9;{item.price}
+                        </Typography>
+                      </CardContent>
+                    </CardActionArea>
+                    <CardActions>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        className={classes.Button}
+                        onClick={() => handleClickViewdetails(item.id)}
                       >
-                        NAME : {item.name}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        color="textSecondary"
-                        component="p"
-                        style={{ textAlign: "center" }}
+                        View Details
+                      </Button>
+                    </CardActions>
+                    <CardActions>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.Button}
+                        onClick={() => handleClickAddTocart(item.id)}
                       >
-                        AMOUNT : &#x20B9;{item.price}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                  <CardActions>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      className={classes.Button}
-                      onClick={() => handleClickViewdetails(item.id)}
-                    >
-                      View Details
-                    </Button>
-                  </CardActions>
-                  <CardActions>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      className={classes.Button}
-                      onClick={() => handleClickAddTocart(item.id)}
-                    >
-                      Add To Cart
-                    </Button>
-                  </CardActions>
-                </Card>
-              );
-            })
-          ) : (
-            <div> Data is not available </div>
-          )}
+                        Add To Cart
+                      </Button>
+                    </CardActions>
+                  </Card>
+                );
+              })
+            ) : (
+              <div> Data is not available </div>
+            )}
+          </Grid>
         </Grid>
       </Grid>
     </div>

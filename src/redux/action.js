@@ -6,6 +6,7 @@ export const ADD_QUANTITY = "ADD_QUANTITY"
 export const SUBTRACT_QUANTITY = "SUBTRACT_QUANTITY"
 export const CHANGE_CATEGORY = "CHANGE_CATEGORY"
 export const FILTER_ITEM =  "FILTER_ITEM"
+export const SEARCH_ITEM = "SEARCH_ITEM"
 
 export function addToCart(itemId) {
     console.log(itemId)
@@ -59,6 +60,14 @@ export function filterItem(payload) {
     console.log(payload)
     return {
         type: FILTER_ITEM,
+        payload
+    }
+}
+
+export function searchItem(payload) {
+    console.log(payload)
+    return {
+        type: SEARCH_ITEM,
         payload
     }
 }

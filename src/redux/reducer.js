@@ -6,6 +6,7 @@ import {
   SUBTRACT_QUANTITY,
   CHANGE_CATEGORY,
   FILTER_ITEM,
+  SEARCH_ITEM,
 } from "./action";
 import { items } from "./state";
 
@@ -17,6 +18,7 @@ const initialState = {
   removeItems: {},
   filterItems: [],
   categoryName: "",
+  searchItems:[],
 };
 
 export let reducer = (state = initialState, action) => {
@@ -233,6 +235,18 @@ export let reducer = (state = initialState, action) => {
         }
       }
       break;
+    case SEARCH_ITEM:
+        let searchItemsArr = []
+        for(let i = 0; i < state.items.length; i++){
+            if(state.items[i].name.toLowerCase().includes(action.payload.toLowerCase())){
+                searchItemsArr.push(state.items[i])
+            }
+        }
+        console.log(searchItemsArr)
+        return{
+            ...state,
+            searchItems: searchItemsArr
+        }
     default:
       return {
         ...state,
