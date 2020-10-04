@@ -31,12 +31,14 @@ export let reducer = (state = initialState, action) => {
       );
       newItemsAdded.quantity = 1;
       let newTotal = state.total + newItemsAdded.price;
+      let temp_data = state.items.filter((item) => item.id === action.payload)[0];
       console.log(state.cartItem);
       return {
         ...state,
         items: itemsList,
         total: newTotal,
         cartItem: [...state.cartItem, newItemsAdded],
+        viewDetailsItem: temp_data
       };
     case VIEW_DETAILS:
       let temp = state.items.filter((item) => item.id === action.payload)[0];
@@ -51,12 +53,14 @@ export let reducer = (state = initialState, action) => {
         (item) => item.id !== action.payload
       );
       let newTotals = state.total - removeItem.price * removeItem.quantity;
+      let temp_remove = state.items.filter((item) => item.id === action.payload)[0];
       console.log(state.removeItems);
       return {
         ...state,
         items: itemsLists,
         cartItem: removeItem,
         total: newTotals,
+        viewDetailsItem: temp_remove
       };
     case ADD_QUANTITY:
       let addedItem = state.cartItem.find((item) => action.payload === item.id);
@@ -236,17 +240,13 @@ export let reducer = (state = initialState, action) => {
       }
       break;
     case SEARCH_ITEM:
-        let searchItemsArr = []
-        for(let i = 0; i < state.items.length; i++){
-            if(state.items[i].name.toLowerCase().includes(action.payload.toLowerCase())){
-                searchItemsArr.push(state.items[i])
-            }
-        }
-        console.log(searchItemsArr)
-        return{
-            ...state,
-            searchItems: searchItemsArr
-        }
+      let searchItemsArr = state.items.filter(item => {
+        return item.name.toLowerCase().indexOf(action.payload.toLowerCase()) !== -1
+    })
+    return{
+        ...state,
+        searchItems: searchItemsArr
+    }
     default:
       return {
         ...state,

@@ -22,6 +22,7 @@ import {
   FormControl,
   Select,
   TextField,
+  Modal,
 } from "@material-ui/core/";
 import SearchIcon from "@material-ui/icons/Search";
 
@@ -71,6 +72,7 @@ export default function Category() {
   const [sortByPrice, setSortByPrice] = useState("all");
   const [searchName, setSearchName] = useState("");
   const [open, setOpen] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const classes = useStyles();
   const history = useHistory();
   const changeCategory = useSelector((state) => state.categoryName);
@@ -158,13 +160,18 @@ export default function Category() {
   const handleSearchChange = (e) => {
     setSearchName(e.target.value);
   };
-  console.log(searchName, searchItems);
+  // console.log(searchName, searchItems);
 
   const handleClickSearch = () => {
     dispatch(searchItem(searchName));
+    setOpenModal(true);
   };
 
   console.log(filterItems);
+  const handleCloseModal = () => {
+    setOpenModal(false);
+  };
+
   return (
     <div>
       <Grid container spacing={1}>
@@ -232,82 +239,99 @@ export default function Category() {
           </CardActions>
         </Grid>
         <Grid item xs={10}>
-          <Grid container spacing={1}style={{ margin: "35px" }}>
-              <Grid item xs={4}> </Grid>
+          <Grid container spacing={1} style={{ margin: "35px" }}>
+            <Grid item xs={4}>
+              {" "}
+            </Grid>
             <Grid item xs={6}>
-            <TextField
-              label="Search.."
-              style={{ marginRight: "10px", marginTop: "-10px" }}
-              value={searchName}
-              onChange={handleSearchChange}
-            ></TextField>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              onClick={handleClickSearch}
+              <TextField
+                label="Search.."
+                style={{ marginRight: "10px", marginTop: "-10px" }}
+                value={searchName}
+                onChange={handleSearchChange}
+              ></TextField>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                onClick={handleClickSearch}
+              >
+                <SearchIcon />
+              </Button>
+            </Grid>
+          </Grid>
+          <Grid item xs={12}>
+            {searchItems.length > 0 && searchItems ? (
+              searchItems.map((item) => {
+                return (
+                  <Card className={classes.root}>
+                    <CardActionArea>
+                      <CardMedia
+                        className={classes.media}
+                        image={item.image}
+                        title="Contemplative Reptile"
+                      />
+                      <CardContent>
+                        <Typography
+                          gutterBottom
+                          variant="body2"
+                          component="p"
+                          style={{ textAlign: "center" }}
+                        >
+                          NAME : {item.name}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="textSecondary"
+                          component="p"
+                          style={{ textAlign: "center" }}
+                        >
+                          AMOUNT : &#x20B9;{item.price}
+                        </Typography>
+                      </CardContent>
+                    </CardActionArea>
+                    <CardActions>
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        className={classes.Button}
+                        onClick={() => handleClickViewdetails(item.id)}
+                      >
+                        View Details
+                      </Button>
+                    </CardActions>
+                    <CardActions>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        className={classes.Button}
+                        onClick={() => handleClickAddTocart(item.id)}
+                      >
+                        Add To Cart
+                      </Button>
+                    </CardActions>
+                  </Card>
+                );
+              })
+            ) : (
+              <div style={{ textAlign: "center" }}>
+                {" "}
+                Search Data is not Available
+              </div>
+            )}
+          </Grid>
+          <Grid item xs={12}>
+            <p
+              style={{
+                textAlign: "center",
+                color: "blue",
+                fontWeight: "bold",
+                textDecoration: "underline",
+              }}
             >
-              <SearchIcon />
-            </Button>
-          </Grid>
-          </Grid>
-          <Grid item xs={12}>
-            {searchItems.length > 0 && searchItems
-              ? searchItems.map((item) => {
-                  return (
-                    <Card className={classes.root}>
-                      <CardActionArea>
-                        <CardMedia
-                          className={classes.media}
-                          image={item.image}
-                          title="Contemplative Reptile"
-                        />
-                        <CardContent>
-                          <Typography
-                            gutterBottom
-                            variant="body2"
-                            component="p"
-                            style={{ textAlign: "center" }}
-                          >
-                            NAME : {item.name}
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            color="textSecondary"
-                            component="p"
-                            style={{ textAlign: "center" }}
-                          >
-                            AMOUNT : &#x20B9;{item.price}
-                          </Typography>
-                        </CardContent>
-                      </CardActionArea>
-                      <CardActions>
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          className={classes.Button}
-                          onClick={() => handleClickViewdetails(item.id)}
-                        >
-                          View Details
-                        </Button>
-                      </CardActions>
-                      <CardActions>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          className={classes.Button}
-                          onClick={() => handleClickAddTocart(item.id)}
-                        >
-                          Add To Cart
-                        </Button>
-                      </CardActions>
-                    </Card>
-                  );
-                })
-              : <div style={{ textAlign: "center"}}> Search Data is not Available</div>}
-          </Grid>
-          <Grid item xs={12}>
-            <p style={{textAlign:"center", color:"blue", fontWeight: "bold", textDecoration:"underline"}}> Category Wise Filterd Data</p>
+              {" "}
+              Category Wise Filterd Data
+            </p>
             {filterItems ? (
               filterItems.map((item) => {
                 return (
@@ -366,6 +390,35 @@ export default function Category() {
           </Grid>
         </Grid>
       </Grid>
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        aria-labelledby="simple-modal-title"
+        aria-describedby="simple-modal-description"
+      >
+        <div
+          style={{
+            marginTop: "200px",
+            width: "400px",
+            marginLeft: "300px",
+            background: "white",
+            transform: "translate (-50%, -50%)",
+            left: "50%",
+            top: "30%",
+          }}
+        >
+          {
+            searchItems ?searchItems.slice(0,10).map(e=>{
+              return(
+                <div>
+                <h5>{e.name.slice(0,50)}</h5>
+                </div>
+              )
+            })
+            : null
+          }
+        </div>
+      </Modal>
     </div>
   );
 }
